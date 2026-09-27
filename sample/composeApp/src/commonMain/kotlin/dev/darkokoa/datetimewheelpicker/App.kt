@@ -36,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,14 +48,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.platform.LocalLocaleList
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.darkokoa.datetimewheelpicker.core.WheelPickerDefaults
 import dev.darkokoa.datetimewheelpicker.core.WheelRows
+import dev.darkokoa.datetimewheelpicker.core.calendar.CalendarType
+import dev.darkokoa.datetimewheelpicker.core.format.CjkSuffixConfig
+import dev.darkokoa.datetimewheelpicker.core.format.MonthDisplayStyle
 import dev.darkokoa.datetimewheelpicker.core.format.TimeFormat
+import dev.darkokoa.datetimewheelpicker.core.format.dateFormatter
 import dev.darkokoa.datetimewheelpicker.core.format.timeFormatter
 import dev.darkokoa.datetimewheelpicker.theme.AppTheme
 import kotlinx.datetime.DateTimeUnit
@@ -439,6 +447,7 @@ private fun DateDemos(
     mutableStateOf(DateDemo.DEFAULT)
   }
 
+
   DemoPage(
     variants = DateDemo.entries,
     selectedVariant = selectedDemo,
@@ -446,6 +455,7 @@ private fun DateDemos(
     stateKey = { it.name },
     modifier = modifier,
   ) { demo ->
+    val locale = Locale("fa")
     when (demo) {
       DateDemo.DEFAULT -> PickerDemoSection(
         title = "Default date picker",
@@ -453,6 +463,8 @@ private fun DateDemos(
       ) { onSnapped, onSnappedChanged ->
         WheelDatePicker(
           startDate = initialDate,
+          calendar = CalendarType.Jalali,
+          dateFormatter = dateFormatter(locale, MonthDisplayStyle.FULL, CjkSuffixConfig.ShowAll),
           onSnappedDate = { date ->
             logPickerCallback("Default date picker", "onSnappedDate", date)
             onSnapped(date.toString())

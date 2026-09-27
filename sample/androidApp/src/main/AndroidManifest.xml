@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:name="dev.darkokoa.datetimewheelpicker.AndroidApp"
         android:icon="@android:drawable/ic_menu_compass"
         android:label="datetime-wheel-picker"
+        tools:replace="android:label"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.NoActionBar">
         <activity

@@ -27,6 +27,35 @@ internal data class Strings(
   val monthNovemberShort: String = "Nov",
   val monthDecemberShort: String = "Dec",
 
+  // Jalali (Persian/Solar Hijri) month names — used when CalendarType.Jalali is selected.
+  // Months 1–12: فروردین … اسفند. Defaults are English transliterations so non-Persian locales
+  // still produce a valid (if less idiomatic) string.
+  val jalaliMonth1Full: String = "Farvardin",
+  val jalaliMonth2Full: String = "Ordibehesht",
+  val jalaliMonth3Full: String = "Khordad",
+  val jalaliMonth4Full: String = "Tir",
+  val jalaliMonth5Full: String = "Mordad",
+  val jalaliMonth6Full: String = "Shahrivar",
+  val jalaliMonth7Full: String = "Mehr",
+  val jalaliMonth8Full: String = "Aban",
+  val jalaliMonth9Full: String = "Azar",
+  val jalaliMonth10Full: String = "Dey",
+  val jalaliMonth11Full: String = "Bahman",
+  val jalaliMonth12Full: String = "Esfand",
+
+  val jalaliMonth1Short: String = "Far",
+  val jalaliMonth2Short: String = "Ord",
+  val jalaliMonth3Short: String = "Kho",
+  val jalaliMonth4Short: String = "Tir",
+  val jalaliMonth5Short: String = "Mor",
+  val jalaliMonth6Short: String = "Sha",
+  val jalaliMonth7Short: String = "Meh",
+  val jalaliMonth8Short: String = "Aba",
+  val jalaliMonth9Short: String = "Aza",
+  val jalaliMonth10Short: String = "Dey",
+  val jalaliMonth11Short: String = "Beh",
+  val jalaliMonth12Short: String = "Esf",
+
   val timeAM: String = "AM",
   val timePM: String = "PM",
 

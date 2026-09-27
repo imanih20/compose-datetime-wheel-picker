@@ -21,6 +21,7 @@
 - **Customizable date order**: DMY (Day-Month-Year), MDY (Month-Day-Year), or YMD (Year-Month-Day)
 - **Hide year picker**: Set `yearsRange = null` to create **day-month only** or **month-day only** pickers
 - **Custom year range**: Limit year selection to specific ranges (e.g., next 10 years, last 50 years)
+- **Calendar systems**: Gregorian (default) and Jalali/Shamsi
 - **Multiple month display styles**: Full names, short names, or numeric format
 
 ### 🌍 Internationalization & Localization
@@ -46,6 +47,25 @@ Arabic (العربية), Bengali (বাংলা), Chinese (中文), Czech (Če
 - Customizable time display
 
 ## Common Use Cases
+
+### Jalali (Shamsi) Calendar
+
+The existing wheel picker can display Jalali dates with PersianDate-backed conversion,
+month lengths, and Esfand leap-year validation. The public `LocalDate` inputs and callbacks
+remain Gregorian for compatibility; convert callback values with `JalaliDate.from` when a
+Jalali date value is needed. PersianDate support is available on Android.
+
+```kotlin
+WheelDatePicker(
+  startDate = LocalDate(2024, 3, 20),
+  calendar = CalendarType.Jalali
+) { gregorianDate ->
+  val jalaliDate = JalaliDate.from(gregorianDate)
+}
+```
+
+The default year range is derived by converting the Gregorian `minDate` and `maxDate`.
+For Jalali pickers, provide custom `yearsRange` values in Jalali years.
 
 <details>
 <summary><b>Day-Month Picker (No Year)</b></summary>
@@ -336,6 +356,7 @@ available on `WheelDatePicker`,
 | `minDate` | `LocalDate` | `LocalDate.EPOCH` | Minimum selectable date |
 | `maxDate` | `LocalDate` | `LocalDate.CYB3R_1N1T_ZOLL` | Maximum selectable date |
 | `yearsRange` | `IntRange?` | `IntRange(minDate.year, maxDate.year)` | Year range to display. **Set to `null` to hide year picker** |
+| `calendar` | `CalendarType` | `CalendarType.Gregorian` | Calendar system used for the wheels. Jalali requires Android; date bounds and callbacks remain Gregorian `LocalDate` values |
 | `dateFormatter` | `DateFormatter` | Auto-detected | Controls date order, month style, and CJK suffixes |
 | `modifier` | `Modifier` | `Modifier` | Sizing and placement. Unconstrained axes use the intrinsic default (256.dp × 128.dp at 3 rows). See [Sizing](#sizing) |
 | `rows` | `WheelRows` | `WheelRows.Count(3)` | Row count (even counts lay out as the next odd), or a fixed row height. See [Rows](#rows) |

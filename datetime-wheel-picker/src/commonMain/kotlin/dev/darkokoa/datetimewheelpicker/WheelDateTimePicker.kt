@@ -20,6 +20,7 @@ import dev.darkokoa.datetimewheelpicker.core.EPOCH
 import dev.darkokoa.datetimewheelpicker.core.SelectorProperties
 import dev.darkokoa.datetimewheelpicker.core.WheelPickerDefaults
 import dev.darkokoa.datetimewheelpicker.core.WheelRows
+import dev.darkokoa.datetimewheelpicker.core.calendar.CalendarType
 import dev.darkokoa.datetimewheelpicker.core.format.CjkSuffixConfig
 import dev.darkokoa.datetimewheelpicker.core.format.DateFormatter
 import dev.darkokoa.datetimewheelpicker.core.format.MonthDisplayStyle
@@ -42,6 +43,9 @@ import kotlinx.datetime.LocalDateTime
  * The picker resolves its size via subcomposition and therefore does not support
  * intrinsic-measurement parents (`IntrinsicSize.Min`/`Max`); pass an explicit `width`/`height`
  * instead.
+ *
+ * @param calendar The calendar system used for the date portion. Defaults to
+ * [CalendarType.Gregorian]. Pass [CalendarType.Jalali] for the Persian calendar.
  */
 @Composable
 fun WheelDateTimePicker(
@@ -63,6 +67,7 @@ fun WheelDateTimePicker(
   selectedTextColor: Color = textColor,
   selectorProperties: SelectorProperties = WheelPickerDefaults.selectorProperties(),
   barrelProperties: BarrelProperties = WheelPickerDefaults.barrelPropertiesFor(rows),
+  calendar: CalendarType = CalendarType.Gregorian,
   onSnappedDateTimeChanged: (snappedDateTime: LocalDateTime) -> Unit = {},
   onSnappedDateTime: (snappedDateTime: LocalDateTime) -> Unit = {},
 ) {
@@ -84,6 +89,7 @@ fun WheelDateTimePicker(
       maxDateTime = maxDateTime,
       yearsRange = yearsRange,
       dateFormatter = dateFormatter,
+      calendar = calendar,
       timeFormatter = timeFormatter,
       viewportSize = effectiveSize,
       rows = rows,
@@ -137,6 +143,7 @@ fun WheelDateTimePicker(
   maxDateTime = maxDateTime,
   yearsRange = yearsRange,
   dateFormatter = dateFormatter,
+  calendar = CalendarType.Gregorian,
   timeFormatter = timeFormatter,
   rows = WheelRows.Count(rowCount),
   textStyle = textStyle,

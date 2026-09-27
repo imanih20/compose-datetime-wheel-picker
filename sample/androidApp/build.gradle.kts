@@ -24,4 +24,5 @@ android {
 dependencies {
   implementation(projects.sample.composeApp)
   implementation(libs.androidx.activityCompose)
+  implementation(libs.compose.ui)
 }

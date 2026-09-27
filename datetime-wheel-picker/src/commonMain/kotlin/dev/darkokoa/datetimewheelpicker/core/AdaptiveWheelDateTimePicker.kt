@@ -12,6 +12,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import dev.darkokoa.datetimewheelpicker.core.calendar.CalendarType
 import dev.darkokoa.datetimewheelpicker.core.format.CjkSuffixConfig
 import dev.darkokoa.datetimewheelpicker.core.format.DateFormatter
 import dev.darkokoa.datetimewheelpicker.core.format.MonthDisplayStyle
@@ -34,6 +35,7 @@ internal fun AdaptiveWheelDateTimePicker(
     monthDisplayStyle = MonthDisplayStyle.SHORT,
     cjkSuffixConfig = CjkSuffixConfig.HideAll
   ),
+  calendar: CalendarType = CalendarType.Gregorian,
   timeFormatter: TimeFormatter = timeFormatter(Locale.current),
   viewportSize: DpSize = DpSize(256.dp, 128.dp),
   rows: WheelRows = WheelRows.Count(3),
@@ -48,9 +50,6 @@ internal fun AdaptiveWheelDateTimePicker(
 ) {
 
   var snappedDateTime by remember { mutableStateOf(startDateTime.truncatedTo(ChronoUnit.MINUTES)) }
-
-  val yearTexts = remember(yearsRange) { yearsRange?.map { it.toString() } ?: listOf() }
-
   Box(modifier = modifier, contentAlignment = Alignment.Center) {
     WheelSelector(
       viewportSize = viewportSize,
@@ -66,6 +65,7 @@ internal fun AdaptiveWheelDateTimePicker(
         maxDate = maxDateTime.date,
         yearsRange = yearsRange,
         dateFormatter = dateFormatter,
+        calendar = calendar,
         viewportSize = DpSize(
           width = if (yearsRange == null) viewportSize.width * 3 / 6 else viewportSize.width * 3 / 5,
           height = viewportSize.height
@@ -80,20 +80,7 @@ internal fun AdaptiveWheelDateTimePicker(
         ),
         barrelProperties = barrelProperties,
         onSnappedDate = { snappedDate ->
-
-          val newDateTime = when (snappedDate) {
-            is SnappedDate.DayOfMonth -> {
-              snappedDateTime.withDayOfMonth(snappedDate.snappedLocalDate.day)
-            }
-
-            is SnappedDate.Month -> {
-              snappedDateTime.withMonthNumber(snappedDate.snappedLocalDate.month.number)
-            }
-
-            is SnappedDate.Year -> {
-              snappedDateTime.withYear(snappedDate.snappedLocalDate.year)
-            }
-          }
+          val newDateTime = LocalDateTime(snappedDate.snappedLocalDate, snappedDateTime.time)
 
           if (!newDateTime.isBefore(minDateTime) && !newDateTime.isAfter(maxDateTime)) {
             snappedDateTime = newDateTime
@@ -101,31 +88,35 @@ internal fun AdaptiveWheelDateTimePicker(
 
           return@AdaptiveWheelDatePicker when (snappedDate) {
             is SnappedDate.DayOfMonth -> {
-              onSnappedDateTime(SnappedDateTime.DayOfMonth(snappedDateTime, snappedDateTime.day - 1))
-              snappedDateTime.day - 1
+              onSnappedDateTime(SnappedDateTime.DayOfMonth(snappedDateTime, snappedDate.snappedIndex))
+              snappedDate.snappedIndex
             }
 
             is SnappedDate.Month -> {
-              onSnappedDateTime(SnappedDateTime.Month(snappedDateTime, snappedDateTime.month.number - 1))
-              snappedDateTime.month.number - 1
+              onSnappedDateTime(SnappedDateTime.Month(snappedDateTime, snappedDate.snappedIndex))
+              snappedDate.snappedIndex
             }
 
             is SnappedDate.Year -> {
-              val newYearTextIndex = yearTexts.indexOf(snappedDateTime.year.toString())
-              onSnappedDateTime(SnappedDateTime.Year(snappedDateTime, newYearTextIndex))
-              newYearTextIndex
+              onSnappedDateTime(SnappedDateTime.Year(snappedDateTime, snappedDate.snappedIndex))
+              snappedDate.snappedIndex
             }
           }
         },
         onSnappedDateChanged = { snappedDate ->
-          onSnappedDateTimeChanged(when (snappedDate) {
-            is SnappedDate.DayOfMonth -> snappedDateTime.withDayOfMonth(snappedDate.snappedLocalDate.day)
-              .let { SnappedDateTime.DayOfMonth(it, it.day - 1) }
-            is SnappedDate.Month -> snappedDateTime.withMonthNumber(snappedDate.snappedLocalDate.month.number)
-              .let { SnappedDateTime.Month(it, it.month.number - 1) }
-            is SnappedDate.Year -> snappedDateTime.withYear(snappedDate.snappedLocalDate.year)
-              .let { SnappedDateTime.Year(it, yearTexts.indexOf(it.year.toString())) }
-          })
+          val dateTime = LocalDateTime(snappedDate.snappedLocalDate, snappedDateTime.time)
+          val snappedDateTimeValue = when (snappedDate) {
+            is SnappedDate.DayOfMonth -> {
+              SnappedDateTime.DayOfMonth(dateTime, snappedDate.snappedIndex)
+            }
+            is SnappedDate.Month -> {
+              SnappedDateTime.Month(dateTime, snappedDate.snappedIndex)
+            }
+            is SnappedDate.Year -> {
+              SnappedDateTime.Year(dateTime, snappedDate.snappedIndex)
+            }
+          }
+          onSnappedDateTimeChanged(snappedDateTimeValue)
         }
       )
       //Time
@@ -186,8 +177,6 @@ internal fun AdaptiveWheelDateTimePicker(
     }
   }
 }
-
-
 
 
 

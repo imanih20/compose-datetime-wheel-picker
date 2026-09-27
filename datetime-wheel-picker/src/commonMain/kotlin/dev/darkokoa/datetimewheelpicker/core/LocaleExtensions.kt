@@ -2,12 +2,17 @@ package dev.darkokoa.datetimewheelpicker.core
 
 import androidx.compose.ui.text.intl.Locale
 import dev.darkokoa.datetimewheelpicker.strings.EnStrings
+import dev.darkokoa.datetimewheelpicker.strings.FaStrings
 import dev.darkokoa.datetimewheelpicker.strings.Strings
 
 private val CJK_LANGUAGES = listOf("zh", "ja", "ko")
+private val RTL_LANGUAGES = setOf("ar", "fa", "he", "ps", "sd", "ug", "ur", "yi")
 
 val Locale.isCjkLanguage: Boolean
   get() = language in CJK_LANGUAGES
+
+internal val Locale.isRtlLanguage: Boolean
+  get() = language in RTL_LANGUAGES
 
 internal fun Locale.resolveStrings(
   stringsMap: Map<String, Strings> = dev.darkokoa.datetimewheelpicker.Strings
@@ -26,6 +31,9 @@ internal fun resolveStringsFromComponents(
   language: String,
   stringsMap: Map<String, Strings>
 ): Strings {
+  if (language == "fa") {
+    return stringsMap["fa"] ?: FaStrings
+  }
   if (script.isNotEmpty()) {
     stringsMap["$language-$script"]?.let { return it }
   }

@@ -3,11 +3,10 @@ package dev.darkokoa.datetimewheelpicker.core
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import dev.darkokoa.datetimewheelpicker.core.calendar.CalendarEngine
 import dev.darkokoa.datetimewheelpicker.core.format.DateFormatter
 import dev.darkokoa.datetimewheelpicker.core.format.MonthDisplayStyle
-import dev.darkokoa.datetimewheelpicker.core.format.formatMonth
 import kotlinx.datetime.LocalDate
 
 internal data class DayOfMonth(
@@ -32,18 +31,13 @@ internal data class Year(
 internal fun rememberFormattedDayOfMonths(
   month: Int,
   year: Int,
-  dateFormatter: DateFormatter
-) = remember(month, year, dateFormatter) {
-  val daysInMonth = when (month) {
-    2 -> if (LocalDate(year, month, 1).isLeapYear) 29 else 28
-    4, 6, 9, 11 -> 30
-    1, 3, 5, 7, 8, 10, 12 -> 31
-    else -> error("Invalid month number: $month")
-  }
+  calendarEngine: CalendarEngine,
+) = remember(month, year, calendarEngine) {
+  val daysInMonth = calendarEngine.daysInMonth(year, month)
 
   (1..daysInMonth).map {
     DayOfMonth(
-      text = dateFormatter.formatDay(it),
+      text = calendarEngine.formatDay(it),
       value = it,
       index = it - 1
     )
@@ -53,15 +47,17 @@ internal fun rememberFormattedDayOfMonths(
 @Composable
 internal fun rememberFormattedMonths(
   datePickerWidth: Dp,
-  dateFormatter: DateFormatter,
-) = remember(dateFormatter, datePickerWidth) {
-  (1..12).map {
-    val monthName = dateFormatter.formatMonth(kotlinx.datetime.Month(it))
-    val monthShortName = dateFormatter.formatMonth(kotlinx.datetime.Month(it), MonthDisplayStyle.SHORT)
+  calendarEngine: CalendarEngine,
+  monthDisplayStyle: MonthDisplayStyle = MonthDisplayStyle.FULL,
+  monthShortDisplayStyle: MonthDisplayStyle = MonthDisplayStyle.SHORT,
+) = remember(datePickerWidth, calendarEngine, monthDisplayStyle, monthShortDisplayStyle) {
+  (1..12).map { monthNumber ->
+    val monthName = calendarEngine.monthName(monthNumber, monthDisplayStyle)
+    val monthShortName = calendarEngine.monthName(monthNumber, monthShortDisplayStyle)
     Month(
       text = if (datePickerWidth / 3 < 55.dp) monthShortName else monthName,
-      value = it,
-      index = it - 1
+      value = monthNumber,
+      index = monthNumber - 1
     )
   }
 }
@@ -69,11 +65,11 @@ internal fun rememberFormattedMonths(
 @Composable
 internal fun rememberFormattedYears(
   yearsRange: IntRange?,
-  dateFormatter: DateFormatter
-) = remember(yearsRange, dateFormatter) {
+  calendarEngine: CalendarEngine,
+) = remember(yearsRange, calendarEngine) {
   yearsRange?.map {
     Year(
-      text = dateFormatter.formatYear(it),
+      text = calendarEngine.formatYear(it),
       value = it,
       index = yearsRange.indexOf(it)
     )

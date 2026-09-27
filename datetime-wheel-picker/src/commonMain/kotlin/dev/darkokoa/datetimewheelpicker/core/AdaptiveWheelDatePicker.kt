@@ -9,6 +9,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import dev.darkokoa.datetimewheelpicker.core.calendar.CalendarType
 import dev.darkokoa.datetimewheelpicker.core.format.CjkSuffixConfig
 import dev.darkokoa.datetimewheelpicker.core.format.DateFormatter
 import dev.darkokoa.datetimewheelpicker.core.format.MonthDisplayStyle
@@ -27,6 +28,7 @@ internal fun AdaptiveWheelDatePicker(
     monthDisplayStyle = MonthDisplayStyle.FULL,
     cjkSuffixConfig = CjkSuffixConfig.ShowAll
   ),
+  calendar: CalendarType = CalendarType.Gregorian,
   viewportSize: DpSize = DpSize(256.dp, 128.dp),
   rows: WheelRows = WheelRows.Count(3),
   textStyle: TextStyle = MaterialTheme.typography.titleMedium,
@@ -46,6 +48,7 @@ internal fun AdaptiveWheelDatePicker(
       maxDate,
       yearsRange,
       dateFormatter,
+      calendar,
       viewportSize,
       rows,
       textStyle,
@@ -65,6 +68,7 @@ internal fun AdaptiveWheelDatePicker(
       maxDate,
       yearsRange,
       dateFormatter,
+      calendar,
       viewportSize,
       rows,
       textStyle,

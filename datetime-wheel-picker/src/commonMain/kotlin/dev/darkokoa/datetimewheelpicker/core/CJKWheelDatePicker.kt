@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.darkokoa.datetimewheelpicker.core
 
 import androidx.compose.foundation.layout.Box
@@ -8,17 +10,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import dev.darkokoa.datetimewheelpicker.core.calendar.CalendarEngine
+import dev.darkokoa.datetimewheelpicker.core.calendar.CalendarType
+import dev.darkokoa.datetimewheelpicker.core.calendar.createCalendarEngine
+import dev.darkokoa.datetimewheelpicker.core.calendar.resolveYearsRange
 import dev.darkokoa.datetimewheelpicker.core.format.CjkSuffixConfig
 import dev.darkokoa.datetimewheelpicker.core.format.DateField
 import dev.darkokoa.datetimewheelpicker.core.format.DateFormatter
 import dev.darkokoa.datetimewheelpicker.core.format.MonthDisplayStyle
 import dev.darkokoa.datetimewheelpicker.core.format.dateFormatter
+import dev.darkokoa.datetimewheelpicker.core.isRtlLanguage
 import dev.darkokoa.datetimewheelpicker.core.resolveLanguageTag
 import dev.darkokoa.datetimewheelpicker.rememberStrings
 import kotlinx.datetime.LocalDate
@@ -36,6 +45,7 @@ internal fun CJKWheelDatePicker(
     monthDisplayStyle = MonthDisplayStyle.SHORT,
     cjkSuffixConfig = CjkSuffixConfig.ShowAll
   ),
+  calendar: CalendarType = CalendarType.Gregorian,
   viewportSize: DpSize = DpSize(256.dp, 128.dp),
   rows: WheelRows = WheelRows.Count(3),
   textStyle: TextStyle = MaterialTheme.typography.titleMedium,
@@ -52,12 +62,14 @@ internal fun CJKWheelDatePicker(
 
   val itemWidth = Dp.Infinity
 
+  val calendarEngine = remember(calendar, dateFormatter) {
+    createCalendarEngine(calendar, dateFormatter)
+  }
+
   val initialDate = remember(startDate, minDate, maxDate) {
     startDate.coerceIn(minDate, maxDate)
   }
-
   var snappedDate by remember { mutableStateOf(initialDate) }
-
   val snappedDateChangeNotifier = remember { SnappedChangeNotifier<LocalDate>() }
   val notifySnappedDateChanged: (SnappedDate) -> Unit = { newSnappedDate ->
     snappedDateChangeNotifier.notifyIfChanged(newSnappedDate.snappedLocalDate) {
@@ -65,12 +77,38 @@ internal fun CJKWheelDatePicker(
     }
   }
 
+  // Resolve initial components via the calendar engine
+  val (initialYear, initialMonth, initialDay) = remember(initialDate, calendarEngine) {
+    val components = calendarEngine.dateComponents(initialDate)
+      ?: Triple(initialDate.year, initialDate.month.number, initialDate.day)
+    Triple(components.first, components.second, components.third)
+  }
+
+  // Resolve current components from snappedDate
+  val snappedComponents = remember(snappedDate, calendarEngine) {
+    val components = calendarEngine.dateComponents(snappedDate)
+      ?: Triple(snappedDate.year, snappedDate.month.number, snappedDate.day)
+    Triple(components.first, components.second, components.third)
+  }
+  val snappedYear = snappedComponents.first
+  val snappedMonth = snappedComponents.second
+  val snappedDay = snappedComponents.third
+
   val dayOfMonths =
-    rememberFormattedDayOfMonths(snappedDate.month.number, snappedDate.year, dateFormatter)
+    rememberFormattedDayOfMonths(snappedMonth, snappedYear, calendarEngine)
 
-  val months = rememberFormattedMonths(Dp.Hairline, dateFormatter)
+  val months = rememberFormattedMonths(Dp.Hairline, calendarEngine, MonthDisplayStyle.SHORT, MonthDisplayStyle.SHORT)
+  val displayedYearsRange = remember(yearsRange, minDate, maxDate, calendarEngine) {
+    calendarEngine.resolveYearsRange(yearsRange, minDate, maxDate)
+  }
+  val years = rememberFormattedYears(displayedYearsRange, calendarEngine)
 
-  val years = rememberFormattedYears(yearsRange, dateFormatter)
+  // Helper: apply a new snapped date only if within Gregorian min/max (existing behaviour).
+  fun updateSnappedDate(newDate: LocalDate) {
+    if (!newDate.isBefore(minDate) && !newDate.isAfter(maxDate)) {
+      snappedDate = newDate
+    }
+  }
 
   Box(modifier = modifier, contentAlignment = Alignment.Center) {
     WheelSelector(
@@ -79,17 +117,25 @@ internal fun CJKWheelDatePicker(
       barrelProperties = barrelProperties,
       properties = selectorProperties,
     )
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.width(viewportSize.width)) {
+    val pickerLayoutDirection =
+      if (calendar == CalendarType.Jalali && currentLocale.isRtlLanguage) {
+        LayoutDirection.Rtl
+      } else {
+        LocalLayoutDirection.current
+      }
+    CompositionLocalProvider(LocalLayoutDirection provides pickerLayoutDirection) {
+      Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.width(viewportSize.width)) {
       dateFormatter.dateOrder.fields.forEach { dateField ->
         when (dateField) {
           DateField.DAY -> {
+            val currentDayOfMonths = dayOfMonths
             WheelTextPickerWithSuffix(
               modifier = Modifier.weight(1f),
               viewportSize = DpSize(
                 width = itemWidth,
                 height = viewportSize.height
               ),
-              texts = dayOfMonths.map { it.text },
+              texts = currentDayOfMonths.map { it.text },
               suffix = if (dateFormatter.cjkSuffixConfig.showDaySuffix) strings.daySuffix else "",
               textToSuffixSpacing = dateFormatter.cjkSuffixConfig.daySuffixSpacing,
               rows = rows,
@@ -103,19 +149,14 @@ internal fun CJKWheelDatePicker(
                 enabled = false
               ),
               barrelProperties = barrelProperties,
-              startIndex = dayOfMonths.find { it.value == initialDate.day }?.index ?: 0,
+              startIndex = currentDayOfMonths.find { it.value == initialDay }?.index ?: 0,
               onScrollFinished = { snappedIndex ->
-                val newDayOfMonth = dayOfMonths.find { it.index == snappedIndex }?.value
-
+                val newDayOfMonth = currentDayOfMonths.find { it.index == snappedIndex }?.value
                 newDayOfMonth?.let {
-                  val newDate = snappedDate.withDayOfMonth(newDayOfMonth)
+                  val newDate = calendarEngine.withDayOfMonth(snappedDate, newDayOfMonth)
+                  newDate?.let { updateSnappedDate(it) }
 
-                  if (!newDate.isBefore(minDate) && !newDate.isAfter(maxDate)) {
-                    snappedDate = newDate
-                  }
-
-                  val newIndex = dayOfMonths.find { it.value == snappedDate.day }?.index
-
+                  val newIndex = currentDayOfMonths.find { it.value == (calendarEngine.dateComponents(snappedDate)?.third ?: snappedDate.day) }?.index
                   newIndex?.let {
                     onSnappedDate(
                       SnappedDate.DayOfMonth(
@@ -125,25 +166,28 @@ internal fun CJKWheelDatePicker(
                     )?.let { return@WheelTextPickerWithSuffix it }
                   }
                 }
-
-                return@WheelTextPickerWithSuffix dayOfMonths.find { it.value == snappedDate.day }?.index
+                return@WheelTextPickerWithSuffix currentDayOfMonths.find { it.value == (calendarEngine.dateComponents(snappedDate)?.third ?: snappedDate.day) }?.index
               },
               onScrollChanged = { snappedIndex ->
-                dayOfMonths.find { it.index == snappedIndex }?.value?.let { newDay ->
-                  notifySnappedDateChanged(SnappedDate.DayOfMonth(localDate = snappedDate.withDayOfMonth(newDay), index = snappedIndex))
+                currentDayOfMonths.find { it.index == snappedIndex }?.value?.let { newDay ->
+                  val pendingDate = calendarEngine.withDayOfMonth(snappedDate, newDay)
+                  pendingDate?.let {
+                    notifySnappedDateChanged(SnappedDate.DayOfMonth(localDate = it, index = snappedIndex))
+                  }
                 }
-              }
+                }
             )
           }
 
           DateField.MONTH -> {
+            val currentMonths = months
             WheelTextPickerWithSuffix(
               modifier = Modifier.weight(1f),
               viewportSize = DpSize(
                 width = itemWidth,
                 height = viewportSize.height
               ),
-              texts = months.map { it.text },
+              texts = currentMonths.map { it.text },
               suffix = if (dateFormatter.cjkSuffixConfig.showMonthSuffix) strings.monthSuffix else "",
               textToSuffixSpacing = dateFormatter.cjkSuffixConfig.monthSuffixSpacing,
               rows = rows,
@@ -157,18 +201,14 @@ internal fun CJKWheelDatePicker(
                 enabled = false
               ),
               barrelProperties = barrelProperties,
-              startIndex = months.find { it.value == initialDate.month.number }?.index ?: 0,
+              startIndex = currentMonths.find { it.value == initialMonth }?.index ?: 0,
               onScrollFinished = { snappedIndex ->
-                val newMonth = months.find { it.index == snappedIndex }?.value
+                val newMonth = currentMonths.find { it.index == snappedIndex }?.value
                 newMonth?.let {
-                  val newDate = snappedDate.withMonthNumber(newMonth)
+                  val newDate = calendarEngine.withMonthNumber(snappedDate, newMonth)
+                  newDate?.let { updateSnappedDate(it) }
 
-                  if (!newDate.isBefore(minDate) && !newDate.isAfter(maxDate)) {
-                    snappedDate = newDate
-                  }
-
-                  val newIndex = months.find { it.value == snappedDate.month.number }?.index
-
+                  val newIndex = currentMonths.find { it.value == (calendarEngine.dateComponents(snappedDate)?.second ?: snappedDate.month.number) }?.index
                   newIndex?.let {
                     onSnappedDate(
                       SnappedDate.Month(
@@ -178,19 +218,22 @@ internal fun CJKWheelDatePicker(
                     )?.let { return@WheelTextPickerWithSuffix it }
                   }
                 }
-
-                return@WheelTextPickerWithSuffix months.find { it.value == snappedDate.month.number }?.index
+                return@WheelTextPickerWithSuffix currentMonths.find { it.value == (calendarEngine.dateComponents(snappedDate)?.second ?: snappedDate.month.number) }?.index
               },
               onScrollChanged = { snappedIndex ->
-                months.find { it.index == snappedIndex }?.value?.let { newMonth ->
-                  notifySnappedDateChanged(SnappedDate.Month(localDate = snappedDate.withMonthNumber(newMonth), index = snappedIndex))
+                currentMonths.find { it.index == snappedIndex }?.value?.let { newMonth ->
+                  val pendingDate = calendarEngine.withMonthNumber(snappedDate, newMonth)
+                  pendingDate?.let {
+                    notifySnappedDateChanged(SnappedDate.Month(localDate = it, index = snappedIndex))
+                  }
                 }
-              }
+                }
             )
           }
 
           DateField.YEAR -> {
-            years?.let { years ->
+            val currentYears = years
+            currentYears?.let { years ->
               WheelTextPickerWithSuffix(
                 modifier = Modifier.weight(1.4f),
                 viewportSize = DpSize(
@@ -211,19 +254,14 @@ internal fun CJKWheelDatePicker(
                   enabled = false
                 ),
                 barrelProperties = barrelProperties,
-                startIndex = years.find { it.value == initialDate.year }?.index ?: 0,
+                startIndex = years.find { it.value == initialYear }?.index ?: 0,
                 onScrollFinished = { snappedIndex ->
                   val newYear = years.find { it.index == snappedIndex }?.value
-
                   newYear?.let {
-                    val newDate = snappedDate.withYear(newYear)
+                    val newDate = calendarEngine.withYear(snappedDate, newYear)
+                    newDate?.let { updateSnappedDate(it) }
 
-                    if (!newDate.isBefore(minDate) && !newDate.isAfter(maxDate)) {
-                      snappedDate = newDate
-                    }
-
-                    val newIndex = years.find { it.value == snappedDate.year }?.index
-
+                    val newIndex = years.find { it.value == (calendarEngine.dateComponents(snappedDate)?.first ?: snappedDate.year) }?.index
                     newIndex?.let {
                       onSnappedDate(
                         SnappedDate.Year(
@@ -233,18 +271,21 @@ internal fun CJKWheelDatePicker(
                       )?.let { return@WheelTextPickerWithSuffix it }
                     }
                   }
-
-                  return@WheelTextPickerWithSuffix years.find { it.value == snappedDate.year }?.index
+                  return@WheelTextPickerWithSuffix years.find { it.value == (calendarEngine.dateComponents(snappedDate)?.first ?: snappedDate.year) }?.index
                 },
                 onScrollChanged = { snappedIndex ->
                   years.find { it.index == snappedIndex }?.value?.let { newYear ->
-                    notifySnappedDateChanged(SnappedDate.Year(localDate = snappedDate.withYear(newYear), index = snappedIndex))
-                  }
-                }
+                    val pendingDate = calendarEngine.withYear(snappedDate, newYear)
+                      pendingDate?.let {
+                        notifySnappedDateChanged(SnappedDate.Year(localDate = it, index = snappedIndex))
+                      }
+                      }
+                    }
               )
             }
           }
         }
+      }
       }
     }
   }
