@@ -10,6 +10,9 @@ plugins {
   alias(libs.plugins.ksp)
 }
 
+group = "dev.darkokoa.datetimewheelpicker"
+version = "1.4.0"
+
 kotlin {
   applyDefaultHierarchyTemplate()
 
@@ -73,6 +76,7 @@ kotlin {
     }
 
     androidMain.dependencies {
+      implementation(libs.persianDate)
     }
 
     jvmMain.dependencies {
@@ -132,7 +136,6 @@ ksp {
 
 mavenPublishing {
   publishToMavenCentral(automaticRelease = true)
-  signAllPublications()
 }
 
 // https://youtrack.jetbrains.com/issue/CMP-4906
