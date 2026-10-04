@@ -1,4 +1,4 @@
-package dev.darkokoa.datetimewheelpicker.theme
+package io.github.imanih20.datetimewheelpicker.sample.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape

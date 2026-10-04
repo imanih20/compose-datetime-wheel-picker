@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-  namespace = "io.github.imanih20.datetimewheelpicker.androidapp"
+  namespace = "io.github.imanih20.datetimewheelpicker.sample.androidapp"
   compileSdk = 37
 
   defaultConfig {
-    applicationId = "dev.darkokoa.datetimewheelpicker.androidApp"
+    applicationId = "io.github.imanih20.datetimewheelpicker.androidApp"
     minSdk = 24
     targetSdk = 36
     versionCode = 1

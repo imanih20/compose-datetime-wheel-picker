@@ -1,4 +1,4 @@
-package dev.darkokoa.datetimewheelpicker
+package io.github.imanih20.datetimewheelpicker.sample
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.mutableStateOf
@@ -9,7 +9,7 @@ import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
-import dev.darkokoa.datetimewheelpicker.theme.AppTheme
+import io.github.imanih20.datetimewheelpicker.sample.theme.AppTheme
 import kotlinx.datetime.LocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals

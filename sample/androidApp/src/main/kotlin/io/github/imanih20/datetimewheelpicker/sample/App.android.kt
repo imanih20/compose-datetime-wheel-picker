@@ -1,4 +1,4 @@
-package dev.darkokoa.datetimewheelpicker
+package io.github.imanih20.datetimewheelpicker.sample
 
 import android.app.Application
 import android.os.Bundle

@@ -1,4 +1,4 @@
-package dev.darkokoa.datetimewheelpicker
+package io.github.imanih20.datetimewheelpicker.sample
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
@@ -56,6 +56,9 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.darkokoa.datetimewheelpicker.WheelDatePicker
+import dev.darkokoa.datetimewheelpicker.WheelDateTimePicker
+import dev.darkokoa.datetimewheelpicker.WheelTimePicker
 import dev.darkokoa.datetimewheelpicker.core.WheelPickerDefaults
 import dev.darkokoa.datetimewheelpicker.core.WheelRows
 import dev.darkokoa.datetimewheelpicker.core.calendar.CalendarType
@@ -64,7 +67,7 @@ import dev.darkokoa.datetimewheelpicker.core.format.MonthDisplayStyle
 import dev.darkokoa.datetimewheelpicker.core.format.TimeFormat
 import dev.darkokoa.datetimewheelpicker.core.format.dateFormatter
 import dev.darkokoa.datetimewheelpicker.core.format.timeFormatter
-import dev.darkokoa.datetimewheelpicker.theme.AppTheme
+import io.github.imanih20.datetimewheelpicker.sample.theme.AppTheme
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime

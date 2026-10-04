@@ -1,6 +1,6 @@
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
-import dev.darkokoa.datetimewheelpicker.App
+import io.github.imanih20.datetimewheelpicker.sample.App
 import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)

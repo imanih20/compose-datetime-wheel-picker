@@ -3,7 +3,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import java.awt.Dimension
-import dev.darkokoa.datetimewheelpicker.App
+import io.github.imanih20.datetimewheelpicker.sample.App
 
 fun main() = application {
   Window(

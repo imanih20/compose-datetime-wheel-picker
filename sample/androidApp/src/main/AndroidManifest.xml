@@ -3,14 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name="dev.darkokoa.datetimewheelpicker.AndroidApp"
+        android:name="io.github.imanih20.datetimewheelpicker.sample.AndroidApp"
         android:icon="@android:drawable/ic_menu_compass"
         android:label="datetime-wheel-picker"
         tools:replace="android:label"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.NoActionBar">
         <activity
-            android:name="dev.darkokoa.datetimewheelpicker.AppActivity"
+            android:name="io.github.imanih20.datetimewheelpicker.sample.AppActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:exported="true"
             android:launchMode="singleInstance"
