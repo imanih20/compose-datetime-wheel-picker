@@ -136,6 +136,34 @@ ksp {
 
 mavenPublishing {
   publishToMavenCentral(automaticRelease = true)
+  signAllPublications()
+
+  pom {
+    name.set("Datetime Wheel Picker")
+    description.set("A datetime wheel picker for Compose Multiplatform.")
+    inceptionYear.set("2026")
+    url.set("https://github.com/imanih20/compose-datetime-wheel-picker")
+
+    licenses {
+      license {
+        name.set("The Apache License, Version 2.0")
+        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+        distribution.set("repo")
+      }
+    }
+    developers {
+      developer {
+        id.set("imanih20")
+        name.set("mohyeddin")
+        url.set("https://github.com/imanih20")
+      }
+    }
+    scm {
+      url.set("https://github.com/imanih20/compose-datetime-wheel-picker")
+      connection.set("scm:git:git://github.com/imanih20/compose-datetime-wheel-picker.git")
+      developerConnection.set("scm:git:ssh://git@github.com:imanih20/compose-datetime-wheel-picker.git")
+    }
+  }
 }
 
 // https://youtrack.jetbrains.com/issue/CMP-4906

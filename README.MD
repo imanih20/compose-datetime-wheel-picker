@@ -441,9 +441,16 @@ WheelDatePicker(
 
 ## Setup
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.darkokoa/datetime-wheel-picker?style=flat)](https://central.sonatype.com/artifact/io.github.darkokoa/datetime-wheel-picker)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.imanih20/datetime-wheel-picker?style=flat)](https://central.sonatype.com/artifact/io.github.imanih20/datetime-wheel-picker)
 
-- Add the Maven Central repository if it is not already there:
+> **Fork notice**: this repository is a fork of
+> [darkokoa/compose-datetime-wheel-picker](https://github.com/darkokoa/compose-datetime-wheel-picker).
+> Its own releases are published under `io.github.imanih20`; the coordinates below refer to this
+> fork. Upstream's own line (`io.github.darkokoa`, currently at 1.5.0) is a separate artifact —
+> pick one, don't mix them.
+
+Built and published with Kotlin 2.4.20, Compose Multiplatform 1.12.0, and AGP 9.3.1. Add the Maven
+Central repository if it is not already there:
 
 ```kotlin
 repositories {
@@ -458,13 +465,12 @@ kotlin {
   sourceSets {
     val commonMain by getting {
       dependencies {
-        implementation("io.github.darkokoa:datetime-wheel-picker:<version>")
+        implementation("io.github.imanih20:datetime-wheel-picker:1.4.1")
         implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
       }
     }
   }
 }
-
 ```
 
 - To use the library in a single-platform project (such as Android project), add a dependency to the dependencies
@@ -472,7 +478,7 @@ kotlin {
 
 ```kotlin
 dependencies {
-  implementation("io.github.darkokoa:datetime-wheel-picker:<version>")
+  implementation("io.github.imanih20:datetime-wheel-picker:1.4.1")
   implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
 }
 ```

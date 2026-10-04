@@ -11,7 +11,7 @@ plugins {
 
 kotlin {
   android {
-    namespace = "dev.darkokoa.datetimewheelpicker.sample"
+    namespace = "io.github.imanih20.datetimewheelpicker.sample"
     compileSdk = 37
     minSdk = 24
 
@@ -97,7 +97,7 @@ compose.desktop {
 
     nativeDistributions {
       targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-      packageName = "dev.darkokoa.datetimewheelpicker.desktopApp"
+      packageName = "io.github.imanih20.datetimewheelpicker.desktopApp"
       packageVersion = "1.0.0"
     }
   }
