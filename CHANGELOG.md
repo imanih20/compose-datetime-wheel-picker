@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Breaking changes
 
+- **1.4.1 on Maven Central shipped the 1.5.0 API.** The breaking `rows: WheelRows`
+  changes below were already published under `io.github.imanih20:1.4.1`, so the
+  `rowCount` overloads that 1.4.1 users were migrating from are still available as
+  `DeprecationLevel.HIDDEN` shims. Nothing about the API changes here; only the
+  version label is new.
 - **`rowCount: Int` is replaced by `rows: WheelRows`** on `WheelDatePicker`, `WheelTimePicker`,
   `WheelDateTimePicker`, and `WheelTextPicker`. `WheelRows.Count(n)` is the previous behavior
   (default `Count(3)`); migrate with `rowCount = 5` → `rows = WheelRows.Count(5)`. The drum

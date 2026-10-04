@@ -446,8 +446,10 @@ WheelDatePicker(
 > **Fork notice**: this repository is a fork of
 > [darkokoa/compose-datetime-wheel-picker](https://github.com/darkokoa/compose-datetime-wheel-picker).
 > Its own releases are published under `io.github.imanih20`; the coordinates below refer to this
-> fork. Upstream's own line (`io.github.darkokoa`, currently at 1.5.0) is a separate artifact —
-> pick one, don't mix them.
+> fork. Upstream's own line (`io.github.darkokoa`) is a separate artifact — pick one, don't mix them.
+>
+> This fork's `1.4.1` was published with the API that would otherwise have been `1.5.0`, so
+> `1.4.1` already contains the breaking `rows: WheelRows` change described in the CHANGELOG.
 
 Built and published with Kotlin 2.4.20, Compose Multiplatform 1.12.0, and AGP 9.3.1. Add the Maven
 Central repository if it is not already there:

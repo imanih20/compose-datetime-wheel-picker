@@ -10,8 +10,12 @@ plugins {
   alias(libs.plugins.ksp)
 }
 
-group = "dev.darkokoa.datetimewheelpicker"
-version = "1.4.0"
+// The Gradle project identity below is only the IDE/`:dependencies` label — the
+// published Maven coordinates come from the mavenPublishing `pom {}` DSL plus the
+// ORG_GRADLE_PROJECT_* properties the release workflow passes in, so the artifact
+// ships under io.github.imanih20 and never under dev.darkokoa.
+group = "io.github.imanih20"
+version = "1.5.0"
 
 kotlin {
   applyDefaultHierarchyTemplate()
@@ -138,6 +142,10 @@ mavenPublishing {
   publishToMavenCentral(automaticRelease = true)
   signAllPublications()
 
+  // POM metadata is declared here and nowhere else. The Vanniktech plugin also
+  // reads POM_* properties from gradle.properties, and those lists are APPENDED
+  // to the ones set below rather than replacing them — having both produced a POM
+  // with two developer and two license entries. Keep this block authoritative.
   pom {
     name.set("Datetime Wheel Picker")
     description.set("A datetime wheel picker for Compose Multiplatform.")
